@@ -96,7 +96,7 @@ The Memory Manager is proposed for a solution deploying Pod and Containers with 
 - This proposal only cover pre-allocated hugepage.
 
 ## Non-Goals
-
+- Updating scheduler, pod spec is out of scope at this point.
 - Support multi size of hugepages together
 
 ## User Stories
@@ -166,7 +166,7 @@ _Figure: Memory Manager components._
 
 
 ### Support reserve huge pages for system on Node Allocatable feature
-
+	- OS와 Kubenet에서 만약 hugepage를 사용한다면 Memory Manager는 알수가 없다 pod을 위한 hugepage가 얼마나 되는지, 해당 하는 usecase로 OVS-DPDK가 있으며 intel의 userspace CNI내용과 SKT 신승호 매니져 보고서 내용 인용하여 OVS-DPDK가 VNF에게 얼마나 중요한지와 이를 위해선 System이 사용할 Hugepage 사용량을 Allocatable feature에서 빼줘야한다를 읍소
 - Do not know how much hugepage OS and kubelet use. Thus, To work the memory manager reliably, hugepages should be reserved for pod. An example of OS or kubelet using hugepage is OVS-DPDK. OVS-DPDK is very improtant for VNF. To ensure hugepage for pod, we need to add a hugepage flag to the Node Allocatble feature.
 
 ### cAdviser changes
