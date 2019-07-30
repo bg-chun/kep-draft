@@ -236,7 +236,7 @@ This will be also followed by a Kubelet Flag for the Memory Manager Policy, whic
 
 ## Phase 1: Alpha (target v1.1x)
 
-- container level hugepage isolation
+- container level hugepage isolation(kubelet에서 직접 접근하는걸로)
 
 - new topology hint provider for memory and hugepage
 
