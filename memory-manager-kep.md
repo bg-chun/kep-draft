@@ -122,8 +122,10 @@ NUMA node affinity represents that which NUMA node has enough capacity of resour
 #### 2) Provide topology hint(node affinity) for Topology Manager.
 aaa
 
-#### 3) Restrict memory access of contaer to a spesific NUMA node. 
-aaa
+#### 3) Isolate memory and hugepages.
+Restrict memory access of contaer to a spesific NUMA node.
+Cgroups cpuset subsystem is used to isolate memory and hugepages.
+
 
 Consequently, Memory Manager guarantees that container's memory and hugepages are isolated to a single NUMA node.
  
