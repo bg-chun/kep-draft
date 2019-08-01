@@ -58,7 +58,7 @@ _Authors:_
 # Overview
 
 NUMA Awareness is well known for a solution to boost performance for diverse use cases including DPDK and Database. Kubernetes support NUMA related features for NUMA sensitive containers.
-The features(CPU Manager, Device Manager, Topology Manager) treat CPU, Device and it's NUMA topology, but there's no feature cover Memory and Hugepages. It can cause inter-NUMA node communication for Memory access and result Memory latency and performance issue.
+The features(CPU Manager, Device Manager, Topology Manager) treat CPU, Device and it's NUMA topology, but there's no feature for memory and hugepages. It can cause inter-NUMA node communication for Memory access which leads to increase an I/O latency and decrease performance.
 
 The Memory Manager is proposed for a solution deploying Pod and Containers with Guaranteed QoS class of Memory and Hugepages under NUMA awareness.
 
@@ -108,9 +108,25 @@ The Memory Manager is proposed for a solution deploying Pod and Containers with 
 
 ### New Component: Memory Manager
 
-WIP
-/*A new component of kubelet enable NUMA-awareness for memory and hugepage usages for a pod. Manages memory / hugepage resource of host by node. When a pod deployment request comes in, it checks the available memory / hugepage per numa node and provide the topology manager a topology hint. It manages the memory / hugepage assigned to the container and updates the available resources for each node when the container is deployed / deleted. These component features can be turned off through feature flag settings.*/
+A new component of Kubelet enables NUMA-awareness for memory and hugepages. The main roles of this component are listed below.
 
+#### 1) Calculate NUMA node affinity for memory and hugepages when Pod admission is requested.
+NUMA node affinity represents that which NUMA node has enough capacity of resources for container. To calculate affinity Memory Manager takes capacity of memory and pre-allocated hugepages per NUMA node except system reserved capacity by Node Allocatable feature. Then when pod is admitted, Memory Manager checks resources availablity of each NUMA nodes and reserves resources internally. 
+
+- Node affinity of memory can be calcuated by below formula.
+
+- Node affinity of hugepage can be calculated by below xxx.
+
+
+
+#### 2) Provide topology hint(node affinity) for Topology Manager.
+aaa
+
+#### 3) Restrict memory access of contaer to a spesific NUMA node. 
+aaa
+
+Consequently, Memory Manager guarantees that container's memory and hugepages are isolated to a single NUMA node.
+ 
 #### New Interfaces
 
 ```go
