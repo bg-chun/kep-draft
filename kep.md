@@ -45,9 +45,6 @@ _Authors:_
   - [Proposed Changes](#proposed-changes)
     - [New Component: Memory Manager](#new-component-memory-manager)
       - [New Interfaces](#new-interfaces)
-    - [Support container isolation of huge pages](#support-container-isolation-of-huge-pages)
-    - [Support reserve huge pages for system on Node Allocatable feature](#support-reserve-huge-pages-for-system-on-node-allocatable-feature)
-    - [cAdviser changes](#cAdviser-changes)
     - [Topology Manager changes](#topology-manager-changes)
     - [Internal Container Lifecycle changes](#internal-container-lifecycle-changes)
     - [Feature Gate and Kubelet Flags](#feature-gate-and-kubelet-flags)
@@ -82,22 +79,18 @@ The Memory Manager is proposed for a solution deploying Pod and Containers with 
 ## Related issues
 
 - [Hardware topology awareness at node level (including NUMA)][numa-issue]
+- [Support Container Isolation of Hugepages][hugepage-issue]
 
 ## Goals
 
 - Guarantee alignment of resources for isolating container's Memory and Hugepages with CPU and I/O devices.
 
-- Provide topology hint for Memory and Hugepages to Topology manager.
-
-- Support container isolation of hugepages
-
-- This proposal only focus on Linux based system.
-
-- This proposal only cover pre-allocated hugepage.
+- Provide topology hint for Memory and Hugepages for Topology manager.
 
 ## Non-Goals
 - Updating scheduler, pod spec is out of scope at this point.
-- Support multi size of hugepages together
+
+- This proposal only focus on Linux based system.
 
 ## User Stories
 
@@ -159,14 +152,9 @@ _Figure: Memory Manager components._
 
 ![memory-manager-class-diagram](related_interfaces.png)
 
-### Support container isolation of huge pages
-
- Under Pod isolation of hugepage there would be a competition to consume Hugepage between containers. As an concrete result, when two containers requests one of 1GB Hugepages, kubelet sets limit on Pod's cgroup with 2GB.
- In this case, if a single container consumes more than 1GB Hugepages another on not able to consume hugepage at all, to avoid this case container isolation of hugepage shoud be suported.
-
 
 ### Support reserve huge pages for system on Node Allocatable feature
-	- OS와 Kubenet에서 만약 hugepage를 사용한다면 Memory Manager는 알수가 없다 pod을 위한 hugepage가 얼마나 되는지, 해당 하는 usecase로 OVS-DPDK가 있으며 intel의 userspace CNI내용과 SKT 신승호 매니져 보고서 내용 인용하여 OVS-DPDK가 VNF에게 얼마나 중요한지와 이를 위해선 System이 사용할 Hugepage 사용량을 Allocatable feature에서 빼줘야한다를 읍소
+- OS와 Kubenet에서 만약 hugepage를 사용한다면 Memory Manager는 알수가 없다 pod을 위한 hugepage가 얼마나 되는지, 해당 하는 usecase로 OVS-DPDK가 있으며 intel의 userspace CNI내용과 SKT 신승호 매니져 보고서 내용 인용하여 OVS-DPDK가 VNF에게 얼마나 중요한지와 이를 위해선 System이 사용할 Hugepage 사용량을 Allocatable feature에서 빼줘야한다를 읍소
 - Do not know how much hugepage OS and kubelet use. Thus, To work the memory manager reliably, hugepages should be reserved for pod. An example of OS or kubelet using hugepage is OVS-DPDK. OVS-DPDK is very improtant for VNF. To ensure hugepage for pod, we need to add a hugepage flag to the Node Allocatble feature.
 
 ### cAdviser changes
@@ -230,43 +218,29 @@ A new feature gate will be added to enable the Memory Manager feature. This feat
 This will be also followed by a Kubelet Flag for the Memory Manager Policy, which is described above. The `none` policy will be the default policy.
 
 - Proposed Policy Flag:  
-  `--memory-manager-policy=none|strict`
+  `--memory-manager-policy=none|SingleNUMA`
 
 # Graduation Criteria
 
 ## Phase 1: Alpha (target v1.1x)
-
-- container level hugepage isolation(kubelet에서 직접 접근하는걸로)
-
-- new topology hint provider for memory and hugepage
-
-- add new flag for hugepages on node allocatable feature(host에서 ovs-dpdk가 사용할 hugepage많큼 제외시켜줘야함,)
+- Feature gate is disabled by default.
+- Alpha Implimentation of Memory Manager based on SingleNUMA policy of Topology Manager
 
 ## Phase 2: Beta
 
-- cAdvisor (세원님이 개발한 코드가 cAdvisor에 기여)
-
-- container runtime이 hugepage 지원한다면 integration? 근대 runc runtime을 누군가가 개선 해 줘야하는대 이걸 누가 해주려나
-
-- Integration Alpha impliments of hugepage to existing hugepage advertising impliments. (현재 스케쥴러에게 hugepage정보 보내주는건 Redhat + intel이 hugepage KEP로 개발 해놓은 상황이고 Alpha구현에선 여길 손 안댐, Beta에선 기존에 Redhat이 개발해놓은 부분을 우리구현으로 대체가능할것으로 보이며 선행조건으로 세원님이 개발한 코드가 cAdvisor에 기여되어야 할듯)
+- TBD
 
 ## GA (stable)
 
-#
+- TBD
 
-# Limitations and Challenges
+## Limitations and Challenges
 
-- 한계와 도전 둘중 하나만 해도 괜찮을거 같은대
+- Alpha에선 Topology Manager의 haftStrict Policy만 따른다
 
 - 완벽한 메모리 관리는 어려움. (os/kubelet reserved만큼 여유를 두면 상관없지만 이는 손해임) => offset 두는 쪽으로
 
 - NUMA 노드 별 메모리 관리에 대한 보장 => offset 두어서 안전하게 관리한다는걸 어필해보자
-
-- 외부 요인에 의한 완벽한 Hugepages 관리가 어렵다. => 삭제 node allocatable featuree 개선시 해결됨
-
-- 컨테이너의 자원이 하나의 NUMA 노드에 대한 isolation만 가능하다.
-  (단일 컨테이너가 여러 Node에서 자원을 할당받으려면 어떻게해야할까..)
-  베타로 넣어놓고 못하면 인텔 처럼 빤스런?
 
 [node-topology-manager]: https://github.com/kubernetes/enhancements/blob/dcc8c7241513373b606198ab0405634af643c500/keps/sig-node/0035-20190130-topology-manager.md
 [cpu-manager]: https://github.com/kubernetes/community/blob/master/contributors/design-proposals/node/cpu-manager.md
@@ -274,3 +248,4 @@ This will be also followed by a Kubelet Flag for the Memory Manager Policy, whic
 [hugepages]: https://github.com/kubernetes/enhancements/blob/master/keps/sig-node/20190129-hugepages.md
 [node-allocatable-feature]: https://github.com/kubernetes/community/blob/master/contributors/design-proposals/node/node-allocatable.md
 [numa-issue]: https://github.com/kubernetes/kubernetes/issues/49964
+[hugepage-issue]: https://github.com/kubernetes/kubernetes/issues/80716
