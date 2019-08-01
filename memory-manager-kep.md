@@ -111,18 +111,22 @@ The Memory Manager is proposed for a solution deploying Pod and Containers with 
 A new component of Kubelet enables NUMA-awareness for memory and hugepages. The main roles of this component are listed below.
 
 #### 1) Calculate NUMA node affinity for memory and hugepages when Pod admission is requested.
-NUMA node affinity represents that which NUMA node has enough capacity of resources for container. To calculate affinity Memory Manager takes capacity of memory and pre-allocated hugepages per NUMA node except system reserved capacity by Node Allocatable feature. Then when pod is admitted, Memory Manager checks resources availablity of each NUMA nodes and reserves resources internally. 
+NUMA node affinity represents that which NUMA node has enough capacity of resources for a container. To calculate affinity Memory Manager takes capacity of memory and pre-allocated hugepages per NUMA node except system and kublet reserved capacity by Node Allocatable feature. Then when pod is admitted, Memory Manager checks resources availablity of each NUMA nodes and reserves resources internally. 
 
-- Node affinity of memory can be calcuated by below formula.
+- Node affinity of memory can be calcuated by below formulas.
+  - Available Memory of NUMA node = Total Memory of NUMA node - Hugepages - system reserved for NUMA node.
+  - Available Memory of NUMA node >= Guaranteed memory for a container.
 
-- Node affinity of hugepage can be calculated by below xxx.
+- Node affinity of hugepage can be calculated by below formulas.
+  - Available huagpages of NUMA node = Total hugepages of NUMA node - reserved by system.
+  - Available huagpages of NUMA node >= Guaranteed hugepages for a container.
 
 
 
 #### 2) Provide topology hint(node affinity) for Topology Manager.
 aaa
 
-#### 3) Isolate memory and hugepages.
+#### 3) Isolate memory and hugepages for a container.
 Restrict memory access of contaer to a spesific NUMA node.
 Cgroups cpuset subsystem is used to isolate memory and hugepages.
 
