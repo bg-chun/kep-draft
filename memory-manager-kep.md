@@ -114,7 +114,7 @@ A new component of Kubelet enables NUMA-awareness for memory and hugepages. The 
 NUMA node affinity represents that which NUMA node has enough capacity of resources for a container. To calculate affinity Memory Manager takes capacity of memory and pre-allocated hugepages per NUMA node except system and kublet reserved capacity by Node Allocatable feature. Then when pod is admitted, Memory Manager checks resources availablity of each NUMA nodes and reserves resources internally. 
 
 - Node affinity of memory can be calcuated by below formulas.
-  - Available Memory of NUMA node = Total Memory of NUMA node - Hugepages - system reserved for NUMA node.
+  - Available Memory of NUMA node = Total Memory of NUMA node - Hugepages - system reserved.
   - Available Memory of NUMA node >= Guaranteed memory for a container.
 
 - Node affinity of hugepage can be calculated by below formulas.
@@ -124,11 +124,10 @@ NUMA node affinity represents that which NUMA node has enough capacity of resour
 
 
 #### 2) Provide topology hint(node affinity) for Topology Manager.
-aaa
+Topology Manager defines HintProvider interface to take topology hints from hint providers. Memory Manager implements the interface to calculate NUMA node affinity and provide topology hint for Topology Manager.
 
 #### 3) Isolate memory and hugepages for a container.
-Restrict memory access of contaer to a spesific NUMA node.
-Cgroups cpuset subsystem is used to isolate memory and hugepages.
+To isolate memory and hugepages for container, Memory Manager restricts memory access of container to a same NUMA node of exclsive CPU. This makes container consumes memory and hugepages on a single NUMA node. Cgroups cpuset subsystem is used to isolate memory and hugepages.
 
 
 Consequently, Memory Manager guarantees that container's memory and hugepages are isolated to a single NUMA node.
@@ -234,7 +233,7 @@ A new feature gate will be added to enable the Memory Manager feature. This feat
 This will be also followed by a Kubelet Flag for the Memory Manager Policy, which is described above. The `none` policy will be the default policy.
 
 - Proposed Policy Flag:  
-  `--memory-manager-policy=none|SingleNUMA`
+  `--memory-manager-policy=none|preferred|singleNUMA`
 
 # Graduation Criteria
 
