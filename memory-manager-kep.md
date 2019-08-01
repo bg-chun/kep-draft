@@ -108,7 +108,8 @@ The Memory Manager is proposed for a solution deploying Pod and Containers with 
 
 ### New Component: Memory Manager
 
-A new component of kubelet enable NUMA-awareness for memory and hugepage usages for a pod. Manages memory / hugepage resource of host by node. When a pod deployment request comes in, it checks the available memory / hugepage per numa node and provide the topology manager a topology hint. It manages the memory / hugepage assigned to the container and updates the available resources for each node when the container is deployed / deleted. These component features can be turned off through feature flag settings.
+WIP
+/*A new component of kubelet enable NUMA-awareness for memory and hugepage usages for a pod. Manages memory / hugepage resource of host by node. When a pod deployment request comes in, it checks the available memory / hugepage per numa node and provide the topology manager a topology hint. It manages the memory / hugepage assigned to the container and updates the available resources for each node when the container is deployed / deleted. These component features can be turned off through feature flag settings.*/
 
 #### New Interfaces
 
@@ -151,13 +152,6 @@ _Listing: Memory Manager and related interfaces (sketch)._
 _Figure: Memory Manager components._
 
 ![memory-manager-class-diagram](related_interfaces.png)
-
-
-### Support reserve huge pages for system on Node Allocatable feature
-- OS와 Kubenet에서 만약 hugepage를 사용한다면 Memory Manager는 알수가 없다 pod을 위한 hugepage가 얼마나 되는지, 해당 하는 usecase로 OVS-DPDK가 있으며 intel의 userspace CNI내용과 SKT 신승호 매니져 보고서 내용 인용하여 OVS-DPDK가 VNF에게 얼마나 중요한지와 이를 위해선 System이 사용할 Hugepage 사용량을 Allocatable feature에서 빼줘야한다를 읍소
-- Do not know how much hugepage OS and kubelet use. Thus, To work the memory manager reliably, hugepages should be reserved for pod. An example of OS or kubelet using hugepage is OVS-DPDK. OVS-DPDK is very improtant for VNF. To ensure hugepage for pod, we need to add a hugepage flag to the Node Allocatble feature.
-
-### cAdviser changes
 
 ### Topology Manager changes
 
