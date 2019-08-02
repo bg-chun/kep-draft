@@ -44,6 +44,9 @@ _Authors:_
 - [Proposal](#proposal)
   - [Proposed Changes](#proposed-changes)
     - [New Component: Memory Manager](#new-component-memory-manager)
+      - [Calculate NUMA node affinity for memory and hugepages](#)
+      - [Provide topology hint for Topology Manager](#)
+      - [Isolate memory and hugepages for a container](#)
       - [New Interfaces](#new-interfaces)
     - [Topology Manager changes](#topology-manager-changes)
     - [Internal Container Lifecycle changes](#internal-container-lifecycle-changes)
@@ -52,8 +55,6 @@ _Authors:_
   - [Phase 1: Alpha (target v1.1x)](#phase-1-Alpha-target-v11x)
   - [Phase 2: Beta](#phase-1-Beta)
   - [GA (stable)](#ga-stable)
-- [Limitations and Challenges](#Limitations-and-Challenges)
-- [Appendix A](#Appendix-A)
 
 # Overview
 
@@ -110,24 +111,31 @@ The Memory Manager is proposed for a solution deploying Pod and Containers with 
 
 A new component of Kubelet enables NUMA-awareness for memory and hugepages. The main roles of this component are listed below.
 
-#### 1) Calculate NUMA node affinity for memory and hugepages when Pod admission is requested.
-NUMA node affinity represents that which NUMA node has enough capacity of resources for a container. To calculate affinity Memory Manager takes capacity of memory and pre-allocated hugepages per NUMA node except system and kublet reserved capacity by Node Allocatable feature. Then when pod is admitted, Memory Manager checks resources availablity of each NUMA nodes and reserves resources internally. 
 
+#### Calculate NUMA node affinity for memory and hugepages
+>NUMA node affinity represents that which NUMA node has enough capacity of memory and/or hugepages for a container. To calculate affinity Memory Manager takes capacity of memory and pre-allocated hugepages per NUMA node except system and Kubenetes reserved capacity by Node Allocatable feature. Then when pod admit is requested, Memory Manager checks resources availablity of each NUMA nodes and reserves resources internally. 
 - Node affinity of memory can be calcuated by below formulas.
-  - Available Memory of NUMA node = Total Memory of NUMA node - Hugepages - system reserved.
-  - Available Memory of NUMA node >= Guaranteed memory for a container.
+  - Allocatable Memory of NUMA node = Total Memory of NUMA node - Hugepages - system reserved - kubernetes reserved.
+  - Allocatable Memory of NUMA node >= Guaranteed memory for a container.
 
 - Node affinity of hugepage can be calculated by below formulas.
   - Available huagpages of NUMA node = Total hugepages of NUMA node - reserved by system.
   - Available huagpages of NUMA node >= Guaranteed hugepages for a container.
 
+##### Note
+  - Node Allocatable feature offers "system-reserved" flag to reserve resources(cpu, memory, ephemeral-storage) for system services and kernel. At this time, kernel memory usage of container is accounted to system-reserved.
+  - Node Allocatable feature offers "kube-reserved" flag to reserve resources for kublet and other kubernetes system daemons.
+  - Node Allocatable feature reserves reources using cgroups that does not reserve(set lmitations) resources per NUMA node.
+  - For this reason, It is hard to calculate allocatable memory at node level.
+  - In alpha, Memory Manager reserves same amount of system-reserved kube-reserved memory per NUMA node.
 
+#### Provide topology hint for Topology Manager
+>Topology Manager defines HintProvider interface to take node affinity of resources from resource managers(CPU, Device Manager). Memory Manager implements the interface to calculate affinity of memory and hubepage then provide topology to Topology Manager.
 
-#### 2) Provide topology hint(node affinity) for Topology Manager.
-Topology Manager defines HintProvider interface to take topology hints from hint providers. Memory Manager implements the interface to calculate NUMA node affinity and provide topology hint for Topology Manager.
+##### Note
 
-#### 3) Isolate memory and hugepages for a container.
-To isolate memory and hugepages for container, Memory Manager restricts memory access of container to a same NUMA node of exclsive CPU. This makes container consumes memory and hugepages on a single NUMA node. Cgroups cpuset subsystem is used to isolate memory and hugepages.
+#### Isolate memory and hugepages for a container
+>To isolate memory and hugepages for container, Memory Manager restricts memory access of container to a same NUMA node of exclsive CPU. This makes container consumes memory and hugepages on a single NUMA node. Cgroups cpuset subsystem is used to isolate memory and hugepages.
 
 
 Consequently, Memory Manager guarantees that container's memory and hugepages are isolated to a single NUMA node.
@@ -139,13 +147,13 @@ package memory manager
 
 type State interface {
   GetAllocatableMemory() uint64
-  GetMemoryAssignments(containerID string) (MemorySet, bool)
+  GetMemoryAssignments(containerID string) (memorytopology.MemoryTopology, bool)
+  GetMachineMemory() memorytopology.MemoryTopology
   GetDefaultMemoryAssignments() ContainerMemoryAssignments
-  GetMemoryPool() MemorySet
   SetAllocatableMemory(allocatableMemory uint64)
-  SetMemoryAssignments(containerID string, ms MemorySet)
+  SetMemoryAssignments(containerID string, mt memorytopology.MemoryTopology)
+  SetMachineMemory(mt memorytopology.MemoryTopology)
   SetDefaultMemoryAssignments(as ContainerMemoryAssignments)
-  SetMemoryPool(memorySet MemorySet)
   Delete(containerID string)
   ClearState()
 }
@@ -155,7 +163,7 @@ type Manager interface {
   AddContainer(p *v1.Pod, c *v1.Container, containerID string) error
   RemoveContainer(containerID string) error
   State() state.Reader
-  GetTopologyHints(pod v1.Pod, container v1.Container) []topologymanager.TopologyHint
+  GetTopologyHints(pod v1.Pod, container v1.Container) map[string][]topologymanager.TopologyHint
 }
 
 type Policy interface {
@@ -176,9 +184,9 @@ _Figure: Memory Manager components._
 
 ### Topology Manager changes
 
-Topology Manager takes hints from cpu manager, device manager. After that, calculate best affinity with policy and used to determine if the pod can admit. Likewise, Memory Manager provide hints to Topology Manager.
+Topology Manager takes topology hints(bits that represents NUMA node) from resource managers such as cpu manager, device manager. Then, it calculates best affinity under given policy(preferred or strict) to determine pod admission. Likewise other resource managers, Memory Manager provide hints to Topology Manager.
 
-Memory Manager implement 'Manager' interface. So Topology Manager add Memory Manager as hint provider at initializing container manager.
+Memory Manager implements 'Manager' interface, so that Topology Manager be able to add Memory Manager as hint provider at initialization sequence.
 
 ```go
 package cm
@@ -190,15 +198,13 @@ func NewContainerManager(...) (ContainerManager, error) {
 }
 ```
 
-Provided hint from Memory Manager is affinity of NUMA nodes(bits) like other managers. So there will be few or no changes to the topology manager.
-
 _Figure: Interfaces with topology manager_
 
 ![memory-manager-interface](interface.png)
 
 ### Internal Container Lifecycle changes
 
-InternalContainerLifecycle interface has 3 functions, PreStartContainer, PreStopContainer, PostStopContainer. In this cases, Memory Manager has to involve managing memory/hugepages when start/stop container.
+InternalContainerLifecycle interface defines following interfaces to manage container resources, PreStartContainer, PreStopContainer, PostStopContainer. In this cases, Memory Manager has to involve managing memory/hugepages when start/stop container.
 
 Memory Manager manage memory with pod, container ID so these function needs that too.
 
@@ -248,14 +254,6 @@ This will be also followed by a Kubelet Flag for the Memory Manager Policy, whic
 ## GA (stable)
 
 - TBD
-
-## Limitations and Challenges
-
-- Alpha에선 Topology Manager의 haftStrict Policy만 따른다
-
-- 완벽한 메모리 관리는 어려움. (os/kubelet reserved만큼 여유를 두면 상관없지만 이는 손해임) => offset 두는 쪽으로
-
-- NUMA 노드 별 메모리 관리에 대한 보장 => offset 두어서 안전하게 관리한다는걸 어필해보자
 
 [node-topology-manager]: https://github.com/kubernetes/enhancements/blob/dcc8c7241513373b606198ab0405634af643c500/keps/sig-node/0035-20190130-topology-manager.md
 [cpu-manager]: https://github.com/kubernetes/community/blob/master/contributors/design-proposals/node/cpu-manager.md
