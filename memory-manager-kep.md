@@ -200,8 +200,6 @@ func NewContainerManager(...) (ContainerManager, error) {
 
 _Figure: Interfaces with topology manager_
 
-![memory-manager-interface](https://raw.githubusercontent.com/bg-chun/kep-draft/master/interface.png)
-
 ### Internal Container Lifecycle changes
 
 InternalContainerLifecycle interface defines following interfaces to manage container resources, PreStartContainer, PreStopContainer, PostStopContainer. In this cases, Memory Manager has to involve managing memory/hugepages when start/stop container.
