@@ -9,14 +9,14 @@ participating-sigs:
   - sig-node
 reviewers:
   - TBD
-  - "@alicedoe"
+  - TBD
 approvers:
   - TBD
-  - "@oscardoe"
+  - TBD
 editor: TBD
-creation-date: 2019-07-18
-last-updated: 2019-07-18
-status: implementable
+creation-date: 2019-08-06
+last-updated: 2019-07-06
+status: draft
 see-also:
 replaces:
 superseded-by:
