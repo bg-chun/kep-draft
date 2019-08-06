@@ -182,6 +182,8 @@ _Figure: Memory Manager components._
 
 ![memory-manager-class-diagram](https://raw.githubusercontent.com/bg-chun/kep-draft/master/related_interfaces.png)
 
+_Figure: Resource Managers with topology manager_
+
 ### Topology Manager changes
 
 Topology Manager takes topology hints(bits that represents NUMA node) from resource managers such as cpu manager, device manager. Then, it calculates best affinity under given policy(preferred or strict) to determine pod admission. Likewise other resource managers, Memory Manager provide hints to Topology Manager.
@@ -197,8 +199,6 @@ func NewContainerManager(...) (ContainerManager, error) {
   ...
 }
 ```
-
-_Figure: Interfaces with topology manager_
 
 ### Internal Container Lifecycle changes
 
