@@ -176,11 +176,11 @@ type Policy interface {
 
 _Listing: Memory Manager and related interfaces (sketch)._
 
-![memory-manager-interfaces](class_diagram.png)
+![memory-manager-interfaces](https://raw.githubusercontent.com/bg-chun/kep-draft/master/class_diagram.png)
 
 _Figure: Memory Manager components._
 
-![memory-manager-class-diagram](related_interfaces.png)
+![memory-manager-class-diagram](https://raw.githubusercontent.com/bg-chun/kep-draft/master/related_interfaces.png)
 
 ### Topology Manager changes
 
@@ -200,7 +200,7 @@ func NewContainerManager(...) (ContainerManager, error) {
 
 _Figure: Interfaces with topology manager_
 
-![memory-manager-interface](interface.png)
+![memory-manager-interface](https://raw.githubusercontent.com/bg-chun/kep-draft/master/interface.png)
 
 ### Internal Container Lifecycle changes
 
