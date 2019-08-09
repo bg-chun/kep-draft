@@ -17,12 +17,20 @@ If process allocates 1.5GB memroy, kernel will allocate two hugepages to process
 ![002](https://raw.githubusercontent.com/bg-chun/kep-draft/master/scenario-a-002.png)
 When container is busy state, container may consume maximum quantity of hugepages.
 Here, it's three of 1GB-Hugepages.
-In this case, if there are no extra hugepages on local numa node, container will comsume hugepages on another NUMA node.
+In this case, if there is no extra hugepages on local numa node, container will comsume hugepages on another NUMA node.
 
 ### Scenario B (Remote Memory Case)
+**[Idle State Case]**
+- Container Blue requests 2 exclusive cpus, 95GB Memory and 3x 1GB-Hugepages.
+- Container Red requests 2 exclusive cpus , 5GB Memory and 3x 1GB-Hugepages.
 ![003](https://raw.githubusercontent.com/bg-chun/kep-draft/master/scenario-a-003.png)
+In this scenario, container blue can be such kind of In-Memory Database(redis).
+Or it can be multiple containers that sharing cpus.
+When container red is idle state, there will be no remote access of memory.
 
+**[Busy State Case]**
 ![004](https://raw.githubusercontent.com/bg-chun/kep-draft/master/scenario-a-004.png)
+But when container red is busy state, there will be remote access of memory.
 
 ### Ideal Case
 **[Ideal Case]**
