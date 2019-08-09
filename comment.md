@@ -25,13 +25,13 @@ In this case, if there is no extra hugepages on local numa node, container will 
 - Container Red requests 2 exclusive cpus , 5GB Memory and 3x 1GB-Hugepages.
 
 **[Idle State Case]**
-![003](https://raw.githubusercontent.com/bg-chun/kep-draft/master/scenario-a-003.png)
+![003](https://raw.githubusercontent.com/bg-chun/kep-draft/master/scenario-a-003.png)  
 In this scenario, container blue can be such kind of In-Memory Database(redis).  
 Or it can be multiple containers that sharing cpus.  
 When container red is idle state, there will be no remote access of memory.
 
 **[Busy State Case]**
-![004](https://raw.githubusercontent.com/bg-chun/kep-draft/master/scenario-a-004.png)
+![004](https://raw.githubusercontent.com/bg-chun/kep-draft/master/scenario-a-004.png)  
 But when container red is busy state, there will be remote access of memory.
 
 ![005](https://raw.githubusercontent.com/bg-chun/kep-draft/master/scenario-a-005.png)
@@ -59,6 +59,7 @@ See [here](https://docs.openstack.org/nova/rocky/admin/cpu-topologies.html#custo
 Moerover Openstack also support that VM takes certain amount of memory from multiple NUMA nodes.  
 see table 3.2 [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_openstack_platform/7/html/instances_and_images_guide/ch-manage_instances#section-update-flavor-metadata).  
 (It seems that Libvirt driver support it, but i'm not sure, i was just an one of users of Openstack)
+
 Example
 ``` 
 Example when the instance has 8 vCPUs and 4GB RAM:
