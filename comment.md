@@ -37,5 +37,6 @@ But when container red is busy state, there will be remote access of memory.
 Maybe, this worstest case can happen, this case will reduce performance of both containers.
 
 Maybe you guys can say those above scenarios are not normal case or it's just coner case.
-But 
+I want to say that it can happen beacuse cgroup sets only limits regardless of resource capacity of NUMA node.
+
 The point is 
