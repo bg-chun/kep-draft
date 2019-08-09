@@ -47,10 +47,13 @@ Topology Manager, CPU Manager and Device Manager (will) does it for cpu and devi
 As @sjenning mentioned above, it seems that [numa_balancing](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_tuning_and_optimization_guide/sect-virtualization_tuning_optimization_guide-numa-auto_numa_balancing) can cover most general cases(like idle state in scenarios).  
 But it cannot **guarantee** local access of memory for container.  
 Without `guaranting local access of memory`, we cannot guarantee performance of DPDK containers.  
-**To guarantee local access like other resources(cpu, gpu, nic), Kubelet should  xxx**
+To guarantee local access of memory, kubelet should schedule container to a NUMA node based on container's memory request.
+
+
+
 
 Otherwise, Openstack which is used to run VNF(DPDK) fully guarantee it, through `hw:numa_mem`property. See [here](https://docs.openstack.org/nova/rocky/admin/cpu-topologies.html#customizing-instance-numa-placement-policies) and [here](https://docs.openstack.org/nova/rocky/user/flavors.html#extra-specs).  
-Moerover Openstack also supports that VM take certain amount of memory from multiple NUMA nodes, see [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_openstack_platform/7/html/instances_and_images_guide/ch-manage_instances#section-update-flavor-metadata).  
+Moerover Openstack also support that VM takes certain amount of memory from multiple NUMA nodes, see table 3.2 [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_openstack_platform/7/html/instances_and_images_guide/ch-manage_instances#section-update-flavor-metadata).  
 (It seems that Libvirt driver support it, but i'm not sure, i was just an one of users of Openstack)
 Example
 ``` 
