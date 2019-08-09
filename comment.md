@@ -45,25 +45,19 @@ The point is `kubelet` does not consider memory capacity of NUMA node.
 Topology Manager, CPU Manager and Device Manager (will) does it for cpu and devices(such as nic and gpu), but there is no consideration of Memory(including Hugepages) at all.
 
 As @sjenning mentioned above, it seems that [numa_balancing](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_tuning_and_optimization_guide/sect-virtualization_tuning_optimization_guide-numa-auto_numa_balancing) can cover most general cases(like idle state in scenarios).  
-But it cannot **guarantee** local access of memory.  
-Without `guaranting local access of memory`, we cannot guarantee performance of DPDK containers.
+But it cannot **guarantee** local access of memory for container.  
+Without `guaranting local access of memory`, we cannot guarantee performance of DPDK containers.  
+**To guarantee local access like other resources(cpu, gpu, nic), Kubelet should  xxx**
 
 Otherwise, Openstack which is used to run VNF(DPDK) fully guarantee it, through `hw:numa_mem`property. See [here](https://docs.openstack.org/nova/rocky/admin/cpu-topologies.html#customizing-instance-numa-placement-policies) and [here](https://docs.openstack.org/nova/rocky/user/flavors.html#extra-specs).  
 Moerover Openstack also supports that VM take certain amount of memory from multiple NUMA nodes, see [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_openstack_platform/7/html/instances_and_images_guide/ch-manage_instances#section-update-flavor-metadata).  
-(It seems that Libvirt driver support it.)
+(It seems that Libvirt driver support it, but i'm not sure, i was just an one of users of Openstack)
 Example
 ``` 
 Example when the instance has 8 vCPUs and 4GB RAM:
     hw:numa_nodes=2
     hw:numa_cpus.0=0,1,2,3,4,5
     hw:numa_cpus.1=6,7
-    hw:numa_mem.0=3  //Mapping N GB of RAM to NUMA node 0
-    hw:numa_mem.1=1  //Mapping N GB of RAM to NUMA node 1. 
+    hw:numa_mem.0=3  //Mapping 3 GB of RAM to NUMA node 0
+    hw:numa_mem.1=1  //Mapping 1 GB of RAM to NUMA node 1. 
 ```
-
-
-
-
-when there is no extra memory on a NUMA node.
-To guarantee local access like other resources(cpu, gpu, nic), Kubelet shoude 
-schedule a container to a NUMA node and counting max 
