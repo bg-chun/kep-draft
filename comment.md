@@ -20,9 +20,10 @@ Here, it's three of 1GB-Hugepages.
 In this case, if there is no extra hugepages on local numa node, container will comsume hugepages on another NUMA node.
 
 ### Scenario B (Remote Memory Case)
-**[Idle State Case]**
 - Container Blue requests 2 exclusive cpus, 95GB Memory and 3x 1GB-Hugepages.
 - Container Red requests 2 exclusive cpus , 5GB Memory and 3x 1GB-Hugepages.
+
+**[Idle State Case]**
 ![003](https://raw.githubusercontent.com/bg-chun/kep-draft/master/scenario-a-003.png)
 In this scenario, container blue can be such kind of In-Memory Database(redis).
 Or it can be multiple containers that sharing cpus.
