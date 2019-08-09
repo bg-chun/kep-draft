@@ -54,11 +54,9 @@ Below image shows a concept of scheduling.
 ![concept-of-scheduling](https://raw.githubusercontent.com/bg-chun/kep-draft/master/concept-of-scheduling.png)
 
 
-Otherwise, Openstack which is used to run VNF(DPDK) fully guarantee it, through `hw:numa_mem`property.  
-See [here](https://docs.openstack.org/nova/rocky/admin/cpu-topologies.html#customizing-instance-numa-placement-policies) and [here](https://docs.openstack.org/nova/rocky/user/flavors.html#extra-specs).  
-Moreover Openstack also support that VM takes certain amount of memory from multiple NUMA nodes.  
-see table 3.2 [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_openstack_platform/7/html/instances_and_images_guide/ch-manage_instances#section-update-flavor-metadata).  
-(It seems that Libvirt driver support it, but i'm not sure, i was just an one of users of Openstack)
+Otherwise, Openstack which is used to run VNF(DPDK) fully guarantee it, through `hw:numa_mem`property, see [here](https://docs.openstack.org/nova/rocky/admin/cpu-topologies.html#customizing-instance-numa-placement-policies) and [here](https://docs.openstack.org/nova/rocky/user/flavors.html#extra-specs).  
+Moreover Openstack also support that VM takes certain amount of memory from multiple NUMA nodes, see table 3.2 [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_openstack_platform/7/html/instances_and_images_guide/ch-manage_instances#section-update-flavor-metadata).  
+It seems that Libvirt driver support it, but i'm not sure, i was just an one of users of Openstack.
 
 Example
 ``` 
