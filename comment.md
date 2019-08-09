@@ -48,4 +48,15 @@ But it cannot **guarantee** local access of memory when there is no extra memory
 To guarantee local access like other resources, Kubelet shoude schedule a container to a NUMA node and counting max 
 
 The Openstack fully guarantee it, through `hw:numa_mem`property. See [here](https://docs.openstack.org/nova/rocky/admin/cpu-topologies.html#customizing-instance-numa-placement-policies) and [here](https://docs.openstack.org/nova/rocky/user/flavors.html#extra-specs).  
-Beyond this they support 
+Moerover Openstack also supports that VM take certain amount of memory from multiple NUMA nodes.  
+Example
+``` 
+Example when the instance has 8 vCPUs and 4GB RAM:
+    hw:numa_nodes=2
+    hw:numa_cpus.0=0,1,2,3,4,5
+    hw:numa_cpus.1=6,7
+    hw:numa_mem.0=3
+    hw:numa_mem.1=1 
+```
+
+(It seems that Libvirt driver support it.)
