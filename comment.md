@@ -34,11 +34,8 @@ When container red is idle state, there will be no remote access of memory.
 But when container red is busy state, there will be remote access of memory.
 
 ![005](https://raw.githubusercontent.com/bg-chun/kep-draft/master/scenario-a-005.png)
-Maybe, this worstest case can happen, this case will reduce performance of all conatiners.
+Maybe, this worstest case can happen, this case will reduce performance of both containers.
 
-### Ideal Case
-**[Ideal Case]**
-
-This is an ideal case without remote access of memory.
-
-
+Maybe you guys can say those above scenarios are not normal case or it's just coner case.
+But 
+The point is 
