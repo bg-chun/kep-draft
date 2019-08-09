@@ -49,7 +49,8 @@ But it cannot **guarantee** local access of memory for container.
 Without `guaranteeing local access of memory`, we cannot guarantee performance of DPDK containers.  
 To guarantee local access of memory, kubelet should schedule container to a NUMA node based on container's memory request.
 Then enforce container to consume memory on a NUMA node using a `cupset.mems`.
-Below image shows a concept of scheduling.
+Below image shows a concept of scheduling.  
+
 ![concept-of-scheduling](https://raw.githubusercontent.com/bg-chun/kep-draft/master/concept-of-scheduling.png)
 
 
