@@ -53,7 +53,6 @@ Below image shows a concept of sheduling.
 ![concept-of-scheduling](https://raw.githubusercontent.com/bg-chun/kep-draft/master/concept-of-scheduling.png)
 
 
-
 Otherwise, Openstack which is used to run VNF(DPDK) fully guarantee it, through `hw:numa_mem`property.  
 See [here](https://docs.openstack.org/nova/rocky/admin/cpu-topologies.html#customizing-instance-numa-placement-policies) and [here](https://docs.openstack.org/nova/rocky/user/flavors.html#extra-specs).  
 Moerover Openstack also support that VM takes certain amount of memory from multiple NUMA nodes.  
