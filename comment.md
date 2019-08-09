@@ -47,8 +47,8 @@ Topology Manager, CPU Manager and Device Manager (will) does it for cpu and devi
 As @sjenning mentioned above, it seems that [numa_balancing](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_tuning_and_optimization_guide/sect-virtualization_tuning_optimization_guide-numa-auto_numa_balancing) can cover most general cases(like idle state in scenarios).  
 But it cannot **guarantee** local access of memory for container.  
 Without `guaranteeing local access of memory`, we cannot guarantee performance of DPDK containers.  
-To guarantee local access of memory, kubelet should schedule container to a NUMA node based on container's memory request.
-Then enforce container to consume memory on a NUMA node using a `cupset.mems`.
+To guarantee local access of memory, kubelet should schedule container to a NUMA node based on container's memory request.  
+Then enforce container to consume memory on a NUMA node using a `cupset.mems`.  
 Below image shows a concept of scheduling.  
 
 ![concept-of-scheduling](https://raw.githubusercontent.com/bg-chun/kep-draft/master/concept-of-scheduling.png)
