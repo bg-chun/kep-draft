@@ -40,6 +40,8 @@ Maybe, this worstest case can happen, this case will reduce performance of both 
 Maybe you guys would say those above scenarios are not normal case or it's just a coner case.
 But I want to say that it can happen beacuse cgroup sets only limits of memory regardless of resource capacity of NUMA node.
 
-The point is `kubelet` does not consider memory capacity of NUMA node yet.
+The point is `kubelet` does not consider memory capacity of NUMA node.
 Topology Manager, CPU Manager and Device Manager (will) does it for cpu and devices(such as nic and gpu), but there is no consideration of Memory(including Hugepages) at all.
 
+As @sjenning mentioned above, it seems that [numa_balancing](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_tuning_and_optimization_guide/sect-virtualization_tuning_optimization_guide-numa-auto_numa_balancing) can cover most general cases(like idle state in scenarios).  
+But it cannot guarantee local access of memory when there is no extra memory on a NUMA node.
